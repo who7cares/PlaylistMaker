@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="for_blocks">41dp</dimen>
+    <dimen name="screen_margins">22dp</dimen>
+</resources>
