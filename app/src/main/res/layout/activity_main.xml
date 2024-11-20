@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3772E7"
+    android:background="@color/background_main"
     android:orientation="vertical"
     android:padding="@dimen/screen_margins">
 
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name2"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="@dimen/text"
         android:paddingBottom="@dimen/for_blocks" />
 
     <LinearLayout
@@ -25,11 +25,11 @@
         <Button
             android:id="@+id/search_button"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/button_main_height"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             android:text="@string/search"
-            android:textSize="22sp"
+            android:textSize="@dimen/text"
             android:textColor="@color/black"
             android:textAllCaps="false"
             app:icon="@drawable/search"
@@ -40,11 +40,11 @@
         <Button
             android:id="@+id/media_button"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/button_main_height"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             android:text="@string/media"
-            android:textSize="22sp"
+            android:textSize="@dimen/text"
             android:textColor="@color/black"
             android:textAllCaps="false"
             app:icon="@drawable/media"
@@ -55,11 +55,11 @@
         <Button
             android:id="@+id/settings_button"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/button_main_height"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             android:text="@string/settings"
-            android:textSize="22dp"
+            android:textSize="@dimen/text"
             android:textColor="@color/black"
             android:textAllCaps="false"
             app:icon="@drawable/settings"

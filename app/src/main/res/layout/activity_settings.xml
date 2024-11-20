@@ -27,13 +27,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings"
-            android:textColor="#1A1B22"
-            android:textSize="22sp" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/view111"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -45,8 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/dark_theme"
-            android:textColor="#1A1B22"
-            android:textSize="16sp" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_small" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/switch_compat"
@@ -72,8 +71,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/share_with_app"
-            android:textColor="#1A1B22"
-            android:textSize="16sp" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_small" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -95,8 +94,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/support"
-            android:textColor="#1A1B22"
-            android:textSize="16sp" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_small" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -118,8 +117,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/user_agreement"
-            android:textColor="#1A1B22"
-            android:textSize="16sp"  />
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_small"  />
 
         <ImageView
             android:layout_width="wrap_content"
