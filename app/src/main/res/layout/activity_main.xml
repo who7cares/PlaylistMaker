@@ -23,53 +23,24 @@
         android:weightSum="3">
 
         <Button
+            style="@style/buttonStyle"
             android:id="@+id/search_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_main_height"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:text="@string/search"
-            android:textSize="@dimen/text"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:icon="@drawable/search"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:foreground="?attr/selectableItemBackground"/>
+            app:icon="@drawable/search" />
 
         <Button
+            style="@style/buttonStyle"
             android:id="@+id/media_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_main_height"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:text="@string/media"
-            android:textSize="@dimen/text"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
-            app:icon="@drawable/media"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:foreground="?attr/selectableItemBackground"/>
+            app:icon="@drawable/media" />
 
         <Button
+            style="@style/buttonStyle"
             android:id="@+id/settings_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_main_height"
-            android:layout_weight="1"
-            android:backgroundTint="@color/white"
             android:text="@string/settings"
-            android:textSize="@dimen/text"
-            android:textColor="@color/black"
-            android:textAllCaps="false"
             app:icon="@drawable/settings"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:foreground="?attr/selectableItemBackground"
-
             android:layout_marginBottom="@dimen/screen_margins" />
 
     </LinearLayout>
-
 
 </LinearLayout>
