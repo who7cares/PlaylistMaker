@@ -24,6 +24,7 @@
         android:weightSum="3">
 
         <Button
+            app:cornerRadius="20dp"
             style="@style/buttonStyle"
             android:id="@+id/search_button"
             android:text="@string/search"
