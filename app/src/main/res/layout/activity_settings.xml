@@ -67,6 +67,7 @@
             android:text="@string/share_with_app" />
 
         <ImageView
+            android:id="@+id/share"
             style="@style/imageView_settingsLayout"
             android:src="@drawable/share" />
 
@@ -84,6 +85,7 @@
             android:text="@string/support" />
 
         <ImageView
+            android:id="@+id/support"
             style="@style/imageView_settingsLayout"
             android:src="@drawable/support" />
 
@@ -101,6 +103,7 @@
             android:text="@string/user_agreement" />
 
         <ImageView
+            android:id="@+id/user_agreement"
             style="@style/imageView_settingsLayout"
             android:src="@drawable/arrow_forward" />
 
