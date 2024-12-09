@@ -1,15 +1,19 @@
 package com.bignerdranch.playlistmaker
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,15 +28,31 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var textInputEditText:TextInputEditText
     private lateinit var buttonArrowBack:ImageView
 
+    private var searchText: String? = null
+
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_search)
 
+
+
         textInputLayout = findViewById(R.id.search_textInputLayout)
         textInputEditText = findViewById(R.id.search_textInputEditText)
         buttonArrowBack = findViewById(R.id.arrow_back_search)
+
+
+
+        // Восстанавливаем текст, если он был сохранен
+        if (savedInstanceState != null) {
+            searchText = savedInstanceState.getString("searchText")
+            textInputEditText.setText(searchText)
+        }
+        // Добавление TextWatcher после восстановления текста
+        textInputEditText.addTextChangedListener(simpleTextWatcher)
+
 
 
         buttonArrowBack.setOnClickListener {
@@ -70,6 +90,8 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
+
+
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
@@ -87,4 +109,32 @@ class SearchActivity : AppCompatActivity() {
         }
         return super.dispatchTouchEvent(event)
     }
+
+    val simpleTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            // empty
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            searchText = p0?.toString()
+        }
+
+        override fun afterTextChanged(p0: Editable?) {
+            // empty
+        }
+    }
+
+//    // Сохраняем данные в Bundle при изменении конфигурации (например, при повороте экрана)
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putString("searchText", searchText)  // Сохраняем текст
+//    }
+//
+//    // Восстанавливаем данные из Bundle при восстановлении активности
+//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+//        super.onRestoreInstanceState(savedInstanceState)
+//        searchText = savedInstanceState.getString("searchText")
+//        textInputEditText.setText(searchText)  // Восстанавливаем текст в поле ввода
+//    }
+
 }
