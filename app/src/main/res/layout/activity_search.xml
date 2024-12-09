@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/search_backgroudnd"
+    android:background="@color/search_background"
     android:orientation="vertical"
     android:padding="@dimen/screen_margins">
 
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="@dimen/screen_margins">
+        android:layout_marginBottom="@dimen/text_small">
 
         <ImageView
             android:id="@+id/arrow_back_search"
@@ -35,7 +35,6 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_textInputLayout"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_marginTop="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:boxBackgroundColor="@color/search_textInputLayout"
@@ -49,7 +48,10 @@
         app:boxCornerRadiusTopStart="12dp"
         app:boxCornerRadiusTopEnd="12dp"
         app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusBottomEnd="12dp" >
+        app:boxCornerRadiusBottomEnd="12dp"
+
+
+        app:cursorColor="@color/cursorColor">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/search_textInputEditText"
@@ -60,7 +62,9 @@
             android:textColorHint="@color/search_hint"
             android:hint="Поиск"
             android:textSize="@dimen/text_small"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:drawablePadding="@dimen/search_drawablePadding"
+            android:padding="0dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

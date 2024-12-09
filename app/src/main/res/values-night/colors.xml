@@ -9,9 +9,10 @@
     <color name="settings_add_icons">#FFFFFFFF</color>
 
     <color name="search_icon_color">#1A1B22</color>
-    <color name="search_backgroudnd">#FF000000</color>
+    <color name="search_background">#FF000000</color>
     <color name="search_textInputLayout">#FFFFFF</color>
     <color name="search_hint">#1A1B22</color>
+    <color name="cursorColor">#3772E7</color>q
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

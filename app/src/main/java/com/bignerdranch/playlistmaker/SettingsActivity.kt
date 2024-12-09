@@ -1,24 +1,26 @@
 package com.bignerdranch.playlistmaker
 
 import android.content.Intent
+import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
+import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var buttonArrowBack: ImageView
-    private lateinit var switch: SwitchCompat
-    private lateinit var share: ImageView
-    private lateinit var sendToSupport: ImageView
-    private lateinit var userAgreement: ImageView
+    private lateinit var switch: SwitchMaterial
+    private lateinit var share: MaterialTextView
+    private lateinit var sendToSupport: MaterialTextView
+    private lateinit var userAgreement: MaterialTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
         buttonArrowBack = findViewById(R.id.arrow_back)
@@ -115,5 +117,46 @@ class SettingsActivity : AppCompatActivity() {
 //        editor.putBoolean("dark_mode", isDarkMode)
 //        editor.apply()
 //    }
+
+
+        // Устанавливаем начальные цвета свича сразу при запуске
+        switch.trackDrawable.setColorFilter(
+            ContextCompat.getColor(this, R.color.track_off),
+            PorterDuff.Mode.SRC_IN
+        )
+
+        switch.thumbDrawable.setColorFilter(
+            ContextCompat.getColor(this, R.color.thumb_off),
+            PorterDuff.Mode.SRC_IN
+        )
+
+
+        // изменяем цвет свича
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            // Изменение цвета полоски (track)
+            if (isChecked) {
+                switch.trackDrawable.setColorFilter(
+                    ContextCompat.getColor(this, R.color.track_on),
+                    PorterDuff.Mode.SRC_IN
+                )
+
+                // Изменение цвета ползунка (thumb)
+                switch.thumbDrawable.setColorFilter(
+                    ContextCompat.getColor(this, R.color.thumb_on),
+                    PorterDuff.Mode.SRC_IN
+                )
+            } else {
+                switch.trackDrawable.setColorFilter(
+                    ContextCompat.getColor(this, R.color.track_off),
+                    PorterDuff.Mode.SRC_IN
+                )
+
+                // Изменение цвета ползунка (thumb)
+                switch.thumbDrawable.setColorFilter(
+                    ContextCompat.getColor(this, R.color.thumb_off),
+                    PorterDuff.Mode.SRC_IN
+                )
+            }
+        }
     }
 }

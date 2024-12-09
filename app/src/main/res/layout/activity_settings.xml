@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/search_background"
     android:padding="@dimen/screen_margins" >
 
     <LinearLayout
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="@dimen/for_blocks">
+        android:layout_marginBottom="@dimen/padding_for_settings">
 
         <ImageView
             android:id="@+id/arrow_back"
@@ -32,81 +33,28 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_compat"
+        style="@style/text_settings_style"
         android:gravity="center_vertical"
-        android:paddingBottom="34dp">
+        android:text="@string/dark_theme" />
 
-        <TextView
-            style="@style/text_settings_style"
-            android:text="@string/dark_theme" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/share"
+        style="@style/text_settings_style"
+        android:drawableEnd="@drawable/share"
+        android:text="@string/share_with_app" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch_compat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:checked="false"
-            android:textOff="OFF"
-            android:textOn="ON"
-            app:showText="false" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/support"
+        style="@style/text_settings_style"
+        android:drawableEnd="@drawable/support"
+        android:text="@string/support" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="@dimen/for_blocks">
-
-        <TextView
-            style="@style/text_settings_style"
-            android:text="@string/share_with_app" />
-
-        <ImageView
-            android:id="@+id/share"
-            style="@style/imageView_settingsLayout"
-            android:src="@drawable/share" />
-
-        </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="@dimen/for_blocks" >
-
-        <TextView
-            style="@style/text_settings_style"
-            android:text="@string/support" />
-
-        <ImageView
-            android:id="@+id/support"
-            style="@style/imageView_settingsLayout"
-            android:src="@drawable/support" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingBottom="@dimen/for_blocks" >
-
-        <TextView
-            style="@style/text_settings_style"
-            android:text="@string/user_agreement" />
-
-        <ImageView
-            android:id="@+id/user_agreement"
-            style="@style/imageView_settingsLayout"
-            android:src="@drawable/arrow_forward" />
-
-    </LinearLayout>
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/user_agreement"
+        style="@style/text_settings_style"
+        android:drawableEnd="@drawable/arrow_forward"
+        android:text="@string/user_agreement" />
 
 </LinearLayout>
