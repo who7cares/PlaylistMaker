@@ -1,15 +1,17 @@
 package com.bignerdranch.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity: AppCompatActivity() {
 
     private lateinit var searchEditText:EditText
     private lateinit var buttonArrowBack:ImageView
@@ -44,8 +46,9 @@ class SearchActivity : AppCompatActivity() {
 
 
         closeImageView.setOnClickListener {
-            // Очищаем содержимое EditText
+            // Очищаем содержимое EditText и прячем клаввиатуру
             searchEditText.text.clear()
+            hideKeyboard()
         }
 
         buttonArrowBack.setOnClickListener {
@@ -92,7 +95,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            closeImageView.visibility = if (p0.isNullOrEmpty()) View.GONE else View.VISIBLE
             searchText = p0?.toString()
+
         }
 
         override fun afterTextChanged(p0: Editable?) {
@@ -114,4 +119,17 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(searchText)
     }
 
+    private fun hideKeyboard() {
+        // Получаем InputMethodManager, который помогает работать с клавиатурой
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+
+        // Проверяем, есть ли активный фокус (т.е. поле, на котором мы что-то вводим)
+        val view = currentFocus
+
+        // Если фокус есть, скрываем клавиатуру
+        if (view != null) {
+            inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
 }
+

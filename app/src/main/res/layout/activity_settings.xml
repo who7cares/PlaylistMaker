@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/search_background"
-    android:padding="@dimen/screen_margins" >
+    android:paddingTop="@dimen/paddingTop"
+    android:paddingEnd="@dimen/paddingLeftAndRight"
+    android:paddingStart="@dimen/paddingLeftAndRight">
 
     <LinearLayout
         android:layout_width="wrap_content"

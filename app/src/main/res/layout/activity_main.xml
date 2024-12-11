@@ -6,7 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/background_main"
     android:orientation="vertical"
-    android:padding="@dimen/screen_margins">
+    android:paddingTop="@dimen/paddingTop"
+    android:paddingEnd="@dimen/paddingLeftAndRight"
+    android:paddingBottom="@dimen/paddingBottom"
+    android:paddingStart="@dimen/paddingLeftAndRight">
 
     <TextView
         android:layout_width="wrap_content"
