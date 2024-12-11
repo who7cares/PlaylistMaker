@@ -32,40 +32,42 @@
             android:textSize="@dimen/text" />
     </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search_textInputLayout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:boxBackgroundColor="@color/search_textInputLayout"
-        app:hintAnimationEnabled="false"
-        app:hintEnabled="false"
-        app:boxStrokeWidth="0dp"
-        app:boxStrokeWidthFocused="0dp"
-        app:endIconMode="clear_text"
-        app:startIconDrawable="@drawable/search"
-        app:startIconTint="@color/search_icon_color"
-        app:boxCornerRadiusTopStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusBottomEnd="12dp"
+        android:layout_height="wrap_content">
 
-
-        app:cursorColor="@color/cursorColor">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/search_textInputEditText"
+        <EditText
+            android:id="@+id/search_editText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/search_shape"
+            android:drawableStart="@drawable/search"
+            android:drawablePadding="@dimen/search_drawablePadding"
+            android:drawableTint="@color/search_hint"
+            android:backgroundTint="@color/searh_box"
+            android:hint="@string/search"
             android:inputType="text"
+            android:maxLines="1"
+
+            android:paddingLeft="12dp"
+            android:paddingTop="8dp"
+            android:paddingRight="40dp"
+            android:paddingBottom="8dp"
             android:textColor="@color/main_text_buttons"
             android:textColorHint="@color/search_hint"
-            android:hint="Поиск"
-            android:textSize="@dimen/text_small"
-            android:maxLines="1"
-            android:drawablePadding="@dimen/search_drawablePadding"
-            android:padding="0dp" />
+            android:textCursorDrawable="@color/cursorColor"
+            android:textSize="@dimen/text_small" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <ImageView
+            android:id="@+id/close_ImageView_button"
+            android:layout_gravity="center_vertical|end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close_icon"
+            app:tint="@color/close_button"
+            android:paddingEnd="14dp"/>
+    </FrameLayout>
+
 
 </LinearLayout>

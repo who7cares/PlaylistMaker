@@ -39,9 +39,7 @@
             android:id="@+id/settings_button"
             style="@style/buttonStyle"
             android:text="@string/settings"
-            app:icon="@drawable/settings"
-            android:layout_marginBottom="@dimen/screen_margins" />
-
+            app:icon="@drawable/settings" />
     </LinearLayout>
 
 
