@@ -4,16 +4,73 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/search_background"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:paddingTop="@dimen/paddingTop"
+    android:paddingEnd="@dimen/paddingLeftAndRight"
+    android:paddingStart="@dimen/paddingLeftAndRight">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Тут должен быть поиск"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:paddingBottom="24dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="@dimen/text_small">
+
+        <ImageView
+            android:id="@+id/arrow_back_search"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            app:tint="@color/settings_back_icon"
+            android:src="@drawable/arrow_back"
+            android:layout_marginEnd="@dimen/screen_margins"/>
+
+        <TextView
+            android:fontFamily="@font/ys_display_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search"
+            android:textColor="@color/main_text"
+            android:textSize="@dimen/text" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/search_editText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/search_shape"
+            android:drawableStart="@drawable/search"
+            android:drawablePadding="@dimen/search_drawablePadding"
+            android:drawableTint="@color/search_hint"
+            android:backgroundTint="@color/searh_box"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:maxLines="1"
+
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="40dp"
+            android:paddingBottom="8dp"
+            android:textColor="@color/main_text_buttons"
+            android:textColorHint="@color/search_hint"
+            android:textCursorDrawable="@color/cursorColor"
+            android:textSize="@dimen/text_small" />
+
+        <ImageView
+            android:id="@+id/close_ImageView_button"
+            android:layout_gravity="center_vertical|end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close_icon"
+            app:tint="@color/close_button"
+
+            android:visibility="gone"
+            android:paddingEnd="14dp"/>
+    </FrameLayout>
 
 </LinearLayout>
