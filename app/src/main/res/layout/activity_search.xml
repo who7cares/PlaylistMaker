@@ -51,7 +51,6 @@
             android:hint="@string/search"
             android:inputType="text"
             android:maxLines="1"
-
             android:paddingStart="12dp"
             android:paddingTop="8dp"
             android:paddingEnd="40dp"
@@ -68,9 +67,15 @@
             android:layout_height="wrap_content"
             android:src="@drawable/close_icon"
             app:tint="@color/close_button"
-
             android:visibility="gone"
             android:paddingEnd="14dp"/>
     </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/screen_margins"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </LinearLayout>
