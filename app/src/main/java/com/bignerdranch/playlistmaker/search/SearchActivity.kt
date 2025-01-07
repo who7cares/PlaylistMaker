@@ -1,7 +1,6 @@
-package com.bignerdranch.playlistmaker
+package com.bignerdranch.playlistmaker.search
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -10,43 +9,68 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.bignerdranch.playlistmaker.MainActivity
+import com.bignerdranch.playlistmaker.R
 
 class SearchActivity: AppCompatActivity() {
 
     private lateinit var searchEditText:EditText
     private lateinit var buttonArrowBack:ImageView
     private lateinit var closeImageView:ImageView
+    private lateinit var recyclerView: RecyclerView
 
     private var searchText: String? = null
+
+    private val tracks = listOf<Track>(
+        Track(
+            "Smells Like Teen Spirit",
+            "Nirvana",
+            "5:01",
+            "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg"),
+        Track("Billie Jean",
+            "Michael Jackson",
+            "4:35",
+            "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg"),
+        Track("Stayin' Alive",
+            "Bee Gees",
+            "4:10",
+            "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg"),
+        Track("Whole Lotta Love",
+            "Led Zeppelin",
+            "5:33",
+            "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg"),
+        Track("Sweet Child O'Mine",
+            "Guns N' Roses",
+            "5:03",
+            "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg")
+    )
+
+    private var filteredTracks = tracks
+
 
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
         setContentView(R.layout.activity_search)
-
-
 
         searchEditText = findViewById(R.id.search_editText)
         buttonArrowBack = findViewById(R.id.arrow_back_search)
         closeImageView = findViewById(R.id.close_ImageView_button)
+        recyclerView = findViewById(R.id.track_list)
 
-
-//
-//        // Восстанавливаем текст, если он был сохранен без использоввания onRestoreInstanceState
-//        if (savedInstanceState != null) {
-//            searchText = savedInstanceState.getString("searchText")
-//            textInputEditText.setText(searchText)
-//        }
+        // логика работы RecycleView
+        val adapter = SearchAdapter(filteredTracks)
+        recyclerView.adapter = adapter
 
 
         // Добавление TextWatcher после восстановления текста
         searchEditText.addTextChangedListener(simpleTextWatcher)
 
 
+        // Очищаем содержимое EditText и прячем клаввиатуру
         closeImageView.setOnClickListener {
-            // Очищаем содержимое EditText и прячем клаввиатуру
             searchEditText.text.clear()
             hideKeyboard()
         }
@@ -55,37 +79,6 @@ class SearchActivity: AppCompatActivity() {
             val intent = Intent(this@SearchActivity, MainActivity::class.java)
             startActivity(intent)
         }
-
-//        // убираем фокус при нажатии enter
-//        textInputEditText.setOnEditorActionListener { v, actionId, event ->
-//            if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                textInputEditText.clearFocus()
-//
-//                // Скрываем клавиатуру
-//                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                imm.hideSoftInputFromWindow(textInputEditText.windowToken, 0)
-//
-//                true
-//            } else {
-//                false
-//            }
-//        }
-//
-//        // убираем фокус при нажатии за пределами бокса
-//        textInputLayout.setOnTouchListener { v, event ->
-//            // Проверяем, если касание произошло за пределами поля ввода
-//            val rect = Rect()
-//            textInputLayout.getGlobalVisibleRect(rect)
-//            if (!rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-//                textInputEditText.clearFocus()
-//
-//                // Скрываем клавиатуру
-//                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                imm.hideSoftInputFromWindow(textInputEditText.windowToken, 0)
-//            }
-//            false
-//        }
-
     }
 
 
@@ -101,18 +94,31 @@ class SearchActivity: AppCompatActivity() {
         }
 
         override fun afterTextChanged(p0: Editable?) {
-            // empty
+            filterTrack(searchText)
         }
     }
 
-    // Сохранение состояния при изменении конфигурации (например, при повороте экрана)
+    // фильтрация треков по веденному тексту в EditText
+    private fun filterTrack(enteredText: String?) {
+        val filteredTracks = if(enteredText.isNullOrEmpty()) {
+            tracks
+        } else {
+            tracks.filter { track ->
+                track.trackName.contains(enteredText, ignoreCase = true) ||
+                        track.artistName.contains(enteredText, ignoreCase = true)
+            }
+        }
+        (recyclerView.adapter as SearchAdapter).updateTracks(filteredTracks)
+    }
+
+    // Сохранение состояния при изменении конфигурации устройста
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         searchText = searchEditText.text.toString()
         outState.putString("searchText", searchText)
     }
 
-    // Восстановление состояния после изменения конфигурации (например, после поворота экрана)
+    // Восстановление состояния после изменения конфигурации устройста
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString("searchText")
@@ -120,13 +126,8 @@ class SearchActivity: AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        // Получаем InputMethodManager, который помогает работать с клавиатурой
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-
-        // Проверяем, есть ли активный фокус (т.е. поле, на котором мы что-то вводим)
         val view = currentFocus
-
-        // Если фокус есть, скрываем клавиатуру
         if (view != null) {
             inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
         }

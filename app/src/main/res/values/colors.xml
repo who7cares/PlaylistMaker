@@ -19,6 +19,7 @@
     <color name="cursorColor">#3772E7</color>
     <color name="searh_box">#E6E8EB</color>
     <color name="close_button">#AEAFB4</color>
+    <color name="group_name_and_duration_andDot">#AEAFB4</color>
 
     <color name="track_off">#AEAFB4</color>
     <color name="thumb_off">#E6E8EB</color>

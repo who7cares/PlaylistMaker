@@ -15,5 +15,8 @@
     <dimen name="padding_for_settings">40dp</dimen>
 
     <dimen name="search_drawablePadding">8dp</dimen>
+    <dimen name="search_song_box_height">61dp</dimen>
+    <dimen name="song_pic">45dp</dimen>
+    <dimen name="text_group_name_and_duration">11sp</dimen>
 
 </resources>
