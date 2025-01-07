@@ -8,8 +8,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class SearchAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(){
+class SearchAdapter() : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(){
+
+    var tracks = ArrayList<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder = SearchViewHolder(parent)
 
@@ -19,10 +23,6 @@ class SearchAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Sear
 
     override fun getItemCount(): Int = tracks.size
 
-    fun updateTracks(newTracks: List<Track>) {
-        tracks = newTracks
-        notifyDataSetChanged()
-    }
 
     class SearchViewHolder(parent: ViewGroup): RecyclerView.ViewHolder(
         LayoutInflater
@@ -38,7 +38,9 @@ class SearchAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Sear
         fun bind(model: Track) {
             trackNameView.text = model.trackName
             artistNameView.text = model.artistName
-            trackTimeView.text = model.trackTime
+
+            val formattedTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
+            trackTimeView.text = formattedTime
 
             Glide.with(itemView)
                 .load(model.artworkUrl100)

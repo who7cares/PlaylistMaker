@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/search_background"
     android:orientation="vertical"
     android:paddingTop="@dimen/paddingTop"
@@ -58,7 +58,11 @@
             android:textColor="@color/main_text_buttons"
             android:textColorHint="@color/search_hint"
             android:textCursorDrawable="@color/cursorColor"
-            android:textSize="@dimen/text_small" />
+            android:textSize="@dimen/text_small"
+
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            />
 
         <ImageView
             android:id="@+id/close_ImageView_button"
