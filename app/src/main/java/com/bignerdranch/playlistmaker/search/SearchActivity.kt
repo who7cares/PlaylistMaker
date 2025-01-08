@@ -7,8 +7,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,10 @@ class SearchActivity: AppCompatActivity() {
     private lateinit var buttonArrowBack:ImageView
     private lateinit var closeImageView:ImageView
     private lateinit var recyclerView: RecyclerView
+
+    private lateinit var placeholderLayoutNotFound: LinearLayout
+    private lateinit var placeholderLayoutConnectionError: LinearLayout
+    private lateinit var updateButton:Button
 
     private var searchText: String? = null
     private val adapter = SearchAdapter()
@@ -54,6 +60,10 @@ class SearchActivity: AppCompatActivity() {
         closeImageView = findViewById(R.id.close_ImageView_button)
         recyclerView = findViewById(R.id.track_list)
 
+        placeholderLayoutNotFound = findViewById(R.id.placeholderLayout_notFound)
+        placeholderLayoutConnectionError = findViewById(R.id.placeholderLayout_connectionError)
+        updateButton = findViewById(R.id.updateButton)
+
 
 
         // логика работы RecycleView
@@ -65,7 +75,7 @@ class SearchActivity: AppCompatActivity() {
         searchEditText.addTextChangedListener(simpleTextWatcher)
 
 
-        // Очищаем содержимое EditText и прячем клаввиатуру
+        // Очищаем содержимое EditText и прячем клаввиатуру при нажатии на крест
         closeImageView.setOnClickListener {
             searchEditText.text.clear()
             hideKeyboard()
@@ -78,72 +88,42 @@ class SearchActivity: AppCompatActivity() {
             startActivity(intent)
         }
 
+
+
         // поиск в iTunes
         searchEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                iTunesService.findTrack(searchEditText.text.toString()).enqueue(object :
-                    Callback<TrackResponse> {
-                    override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                        if (response.code() == 200) {
-                            tracks.clear()
-                            if(response.body()?.results?.isNotEmpty() == true) {
-                                tracks.addAll(response.body()?.results!!)
-                                adapter.notifyDataSetChanged()
-                            }
-                            if(tracks.isEmpty()) {
-                                showMessage("ичего не найдено", "")
-                            } else {
-                                showMessage("", "")
-                            }
-                        } else {
-                            showMessage("что-то пошло не так", response.code().toString())
-                        }
-                    }
-
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        showMessage("что-то пошло не так", t.message.toString())
-                    }
-
-                })
+                fetchTracks(searchEditText.text.toString())
+                hideKeyboard()
                 true
+            } else {
+                false
             }
-            false
+        }
+
+        // Повторный запрос в iTunes
+        updateButton.setOnClickListener {
+            fetchTracks(searchEditText.text.toString())
         }
 
     }
 
-    private fun showMessage(text: String, additionalMessage: String){
-        if(text.isNotEmpty()) {
-            // placeholder Visability
-            tracks.clear()
-            adapter.notifyDataSetChanged()
-            // playsholdermessage.text = text
-            if(additionalMessage.isNotEmpty()) {
-                Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
-            }
-        } else {
-            // placeholderMessage.visibility = View.GONE
-        }
-    }
+
 
     private val simpleTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             // empty
         }
-
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             closeImageView.visibility = if (p0.isNullOrEmpty()) View.GONE else View.VISIBLE
             searchText = p0?.toString()
-
         }
-
         override fun afterTextChanged(p0: Editable?) {
         }
     }
 
 
-
-    // Сохранение состояния при изменении конфигурации устройста: введенный текст и список песен
+    // Сохранение состояния при изменении конфигурации устройста: введенный текст; список песен; плейсхолдеры
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         searchText = searchEditText.text.toString()
@@ -151,9 +131,13 @@ class SearchActivity: AppCompatActivity() {
 
         val tracksJson = gson.toJson(tracks)
         outState.putString("tracks", tracksJson)
+
+        outState.putInt("placeholderNotFoundVisibility", placeholderLayoutNotFound.visibility)
+        outState.putInt("placeholderConnectionErrorVisibility", placeholderLayoutConnectionError.visibility)
+
     }
 
-    // Восстановление состояния после изменения конфигурации устройста: введенный текст и список песен
+    // Восстановление состояния после изменения конфигурации устройста: введенный текст; список песен; плейсхолдеры
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         searchText = savedInstanceState.getString("searchText")
@@ -167,6 +151,9 @@ class SearchActivity: AppCompatActivity() {
             tracks.addAll(restoredTracks)
             adapter.notifyDataSetChanged()
         }
+
+        placeholderLayoutNotFound.visibility = savedInstanceState.getInt("placeholderNotFoundVisibility", View.GONE)
+        placeholderLayoutConnectionError.visibility = savedInstanceState.getInt("placeholderConnectionErrorVisibility", View.GONE)
     }
 
     private fun hideKeyboard() {
@@ -175,6 +162,40 @@ class SearchActivity: AppCompatActivity() {
         if (view != null) {
             inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
         }
+    }
+
+    // логика работы iTunesAPI
+    private fun fetchTracks(searchQuery: String) {
+        iTunesService.findTrack(searchQuery).enqueue(object : Callback<TrackResponse> {
+            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                if (response.code() == 200) {
+                    tracks.clear()
+                    if (response.body()?.results?.isNotEmpty() == true) {
+                        tracks.addAll(response.body()?.results!!)
+                        adapter.notifyDataSetChanged()
+                        placeholderLayoutNotFound.visibility = View.GONE
+                        placeholderLayoutConnectionError.visibility = View.GONE
+                    } else {
+                        tracks.clear()
+                        adapter.notifyDataSetChanged()
+                        placeholderLayoutNotFound.visibility = View.VISIBLE
+                        placeholderLayoutConnectionError.visibility = View.GONE
+                    }
+                } else {
+                    tracks.clear()
+                    adapter.notifyDataSetChanged()
+                    placeholderLayoutConnectionError.visibility = View.VISIBLE
+                    placeholderLayoutNotFound.visibility = View.GONE
+                }
+            }
+
+            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+                placeholderLayoutConnectionError.visibility = View.VISIBLE
+                placeholderLayoutNotFound.visibility = View.GONE
+            }
+        })
     }
 }
 

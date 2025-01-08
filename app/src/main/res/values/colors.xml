@@ -20,6 +20,7 @@
     <color name="searh_box">#E6E8EB</color>
     <color name="close_button">#AEAFB4</color>
     <color name="group_name_and_duration_andDot">#AEAFB4</color>
+    <color name="text_error_color">#1A1B22</color>
 
     <color name="track_off">#AEAFB4</color>
     <color name="thumb_off">#E6E8EB</color>
