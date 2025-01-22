@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.R
 import com.bumptech.glide.Glide
@@ -13,12 +14,19 @@ import java.util.Locale
 
 class SearchAdapter() : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(){
 
+
     var tracks = ArrayList<Track>()
+    var searchTracks = ArrayList<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder = SearchViewHolder(parent)
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(tracks[position])
+
+        holder.itemView.setOnClickListener {
+            searchTracks.add(tracks[position])
+            notifyItemInserted(position)
+        }
     }
 
     override fun getItemCount(): Int = tracks.size
@@ -48,6 +56,9 @@ class SearchAdapter() : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(){
                 .transform(RoundedCorners(2))
                 .placeholder(R.drawable.placeholder_search)
                 .into(artworkUrl100View)
+
+
         }
+
     }
 }

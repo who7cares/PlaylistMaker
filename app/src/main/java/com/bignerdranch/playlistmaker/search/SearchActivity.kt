@@ -30,6 +30,7 @@ class SearchActivity: AppCompatActivity() {
     private lateinit var buttonArrowBack:ImageView
     private lateinit var closeImageView:ImageView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewForSearch: RecyclerView
 
     private lateinit var placeholderLayoutNotFound: LinearLayout
     private lateinit var placeholderLayoutConnectionError: LinearLayout
@@ -37,8 +38,11 @@ class SearchActivity: AppCompatActivity() {
 
     private var searchText: String? = null
     private val adapter = SearchAdapter()
+    private val adapterForSearch = SearchAdapter()
+
 
     private val tracks = ArrayList<Track>()
+    private val searchTracks = ArrayList<Track>()
     private val gson = Gson()
 
     private val retrofit = Retrofit.Builder()
@@ -59,6 +63,7 @@ class SearchActivity: AppCompatActivity() {
         buttonArrowBack = findViewById(R.id.arrow_back_search)
         closeImageView = findViewById(R.id.close_ImageView_button)
         recyclerView = findViewById(R.id.track_list)
+        recyclerViewForSearch = findViewById(R.id.search_list)
 
         placeholderLayoutNotFound = findViewById(R.id.placeholderLayout_notFound)
         placeholderLayoutConnectionError = findViewById(R.id.placeholderLayout_connectionError)
@@ -69,6 +74,10 @@ class SearchActivity: AppCompatActivity() {
         // логика работы RecycleView
         adapter.tracks = tracks
         recyclerView.adapter = adapter
+
+        adapterForSearch.searchTracks = searchTracks
+        recyclerViewForSearch.adapter = adapterForSearch
+
 
 
         // Добавление TextWatcher после восстановления текста

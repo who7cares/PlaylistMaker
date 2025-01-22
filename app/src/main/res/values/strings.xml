@@ -19,5 +19,8 @@
     <string name="connection_error_text1">Проблемы со связью</string>
     <string name="connection_error_text2">Загрузка не удалась. Проверьте подключение к интернету</string>
     <string name="reConnect">Обновить</string>
+    <string name="your_search">Вы искали</string>
+    <string name="clean_search_list">Очистить историю</string>
+
 
 </resources>
