@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/search_background"
     android:orientation="vertical"
     android:paddingTop="@dimen/paddingTop"
@@ -58,7 +58,11 @@
             android:textColor="@color/main_text_buttons"
             android:textColorHint="@color/search_hint"
             android:textCursorDrawable="@color/cursorColor"
-            android:textSize="@dimen/text_small" />
+            android:textSize="@dimen/text_small"
+
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            />
 
         <ImageView
             android:id="@+id/close_ImageView_button"
@@ -71,11 +75,78 @@
             android:paddingEnd="14dp"/>
     </FrameLayout>
 
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <androidx.recyclerview.widget.RecyclerView
+
         android:id="@+id/track_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/screen_margins"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <!-- Плейсхолдер при ненаходе песен -->
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/placeholderLayout_notFound"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/error_nothing_found" />
+
+            <TextView
+                style="@style/text_search_error"
+                android:text="@string/nothing_search_found_text"/>
+        </LinearLayout>
+
+        <!-- Плейсхолдер при ошибке подключения -->
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/placeholderLayout_connectionError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/error_connection" />
+
+            <TextView
+                style="@style/text_search_error"
+                android:text="@string/connection_error_text1"/>
+
+            <TextView
+                style="@style/text_search_error"
+                android:text="@string/connection_error_text2"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:gravity="center" />
+
+            <Button
+                android:id="@+id/updateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/screen_margins"
+                android:backgroundTint="@color/text_error_color"
+                android:text="@string/reConnect"
+                android:textColor="@color/search_background"
+                app:cornerRadius="54dp" />
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

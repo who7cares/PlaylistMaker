@@ -15,5 +15,9 @@
     <string name="sendToSupport_text">Спасибо разработчикам и разработчицам за крутое приложение</string>
     <string name="userAgreement_url">https://yandex.ru/legal/practicum_offer/</string>
 
+    <string name="nothing_search_found_text">Ничего не нашлось</string>
+    <string name="connection_error_text1">Проблемы со связью</string>
+    <string name="connection_error_text2">Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="reConnect">Обновить</string>
 
 </resources>

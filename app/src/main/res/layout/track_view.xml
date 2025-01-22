@@ -34,8 +34,6 @@
             <TextView
                 style="@style/text_track_view"
                 android:id="@+id/artistName"
-                android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_marginStart="@dimen/search_drawablePadding"
                 android:textColor="@color/group_name_and_duration_andDot"
                 android:textSize="@dimen/text_group_name_and_duration"
@@ -52,7 +50,7 @@
                 style="@style/text_track_view"
                 android:id="@+id/trackTime"
                 android:textColor="@color/group_name_and_duration_andDot"
-                android:layout_marginEnd="15dp"
+                android:layout_marginStart="0dp"
                 tools:text="1:11"
                 android:textSize="@dimen/text_group_name_and_duration" />
 
