@@ -11,17 +11,21 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class SearchAdapter(private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>(){
+class SearchAdapter(
+    private val itemClickListener: OnItemClickListener,
+    private val isClickable: Boolean = false
+) : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
     var tracks = ArrayList<Track>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder = SearchViewHolder(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder =
+        SearchViewHolder(parent)
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(tracks[position])
 
         holder.itemView.setOnClickListener {
-            itemClickListener.onItemClick(tracks[position]) // Передаем нажатый элемент в активность
+            if(isClickable) itemClickListener.onItemClick(tracks[position]) // Передаем нажатый элемент в активность
         }
 
     }

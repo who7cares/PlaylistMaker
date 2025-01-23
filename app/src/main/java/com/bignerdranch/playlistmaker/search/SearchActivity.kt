@@ -35,12 +35,13 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private lateinit var placeholderLayoutNotFound: LinearLayout
     private lateinit var placeholderLayoutConnectionError: LinearLayout
+    private lateinit var layoutForSearchList: LinearLayout
     private lateinit var updateButton:Button
 
     private var searchText: String? = null
 
-    private val adapter = SearchAdapter(this)
-    private val adapterForSearch = SearchAdapter(this)
+    private val adapter = SearchAdapter(this, isClickable = true)
+    private val adapterForSearch = SearchAdapter(this, isClickable = false)
 
     private val tracks = ArrayList<Track>()
     private val searchTracks = ArrayList<Track>()
@@ -71,6 +72,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         placeholderLayoutNotFound = findViewById(R.id.placeholderLayout_notFound)
         placeholderLayoutConnectionError = findViewById(R.id.placeholderLayout_connectionError)
         updateButton = findViewById(R.id.updateButton)
+        layoutForSearchList = findViewById(R.id.searched_tracks)
 
 
         // логика работы RecycleView
@@ -91,6 +93,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             hideKeyboard()
             tracks.clear()
             adapter.notifyDataSetChanged()
+            updatePlaceholders(showNotFound = false, showConnectionError = false)
         }
 
         buttonArrowBack.setOnClickListener {
@@ -105,10 +108,15 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 fetchTracks(searchEditText.text.toString())
                 hideKeyboard()
+                placeholderLayoutNotFound.visibility = View.GONE
                 true
             } else {
                 false
             }
+        }
+
+        searchEditText.setOnFocusChangeListener { view, hasFocus ->
+            layoutForSearchList.visibility = if (hasFocus && searchEditText.text.isEmpty()) View.VISIBLE else View.INVISIBLE
         }
 
         // Повторный запрос в iTunes
@@ -120,11 +128,19 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     // реализация интерфейса из класса SearchAdapter для добавления нажатых треков в новый список
     override fun onItemClick(track: Track) {
-        if (!searchTracks.contains(track)) {
-            searchTracks.add(track)
-            // Обновите адаптер для второго RecyclerView
-            adapterForSearch.notifyItemInserted(searchTracks.size - 1)
+        val existingTrack = searchTracks.find { it.trackId == track.trackId }
+
+        if (existingTrack != null) {
+            // Если трек найден, удаляем его
+            searchTracks.remove(existingTrack)
+        } else if (searchTracks.size >= 10) {
+            // Если трек не найден, но в списке больше 10, удаляем последний
+            searchTracks.removeAt(searchTracks.size - 1)
         }
+
+        searchTracks.add(0, track)
+        adapterForSearch.notifyDataSetChanged()
+
     }
 
 
@@ -135,6 +151,10 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             closeImageView.visibility = if (p0.isNullOrEmpty()) View.GONE else View.VISIBLE
             searchText = p0?.toString()
+
+            layoutForSearchList.visibility = if (searchEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
+
+            if (p0.isNullOrEmpty())  updatePlaceholders(showNotFound = false, showConnectionError = false)
         }
         override fun afterTextChanged(p0: Editable?) {
         }
@@ -149,6 +169,9 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
         val tracksJson = gson.toJson(tracks)
         outState.putString("tracks", tracksJson)
+
+        val searchTracksJson = gson.toJson(searchTracks)
+        outState.putString("searchTracks", searchTracksJson)
 
         outState.putInt("placeholderNotFoundVisibility", placeholderLayoutNotFound.visibility)
         outState.putInt("placeholderConnectionErrorVisibility", placeholderLayoutConnectionError.visibility)
@@ -170,6 +193,14 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             adapter.notifyDataSetChanged()
         }
 
+        val savedSearchTracksJson = savedInstanceState.getString("searchTracks")
+        if (!savedSearchTracksJson.isNullOrEmpty()) {
+            val trackType = object : TypeToken<ArrayList<Track>>() {}.type
+            val restoredTracks: ArrayList<Track> = gson.fromJson(savedSearchTracksJson, trackType)
+            searchTracks.addAll(restoredTracks)
+            adapter.notifyDataSetChanged()
+        }
+
         placeholderLayoutNotFound.visibility = savedInstanceState.getInt("placeholderNotFoundVisibility", View.GONE)
         placeholderLayoutConnectionError.visibility = savedInstanceState.getInt("placeholderConnectionErrorVisibility", View.GONE)
     }
@@ -186,36 +217,32 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private fun fetchTracks(searchQuery: String) {
         iTunesService.findTrack(searchQuery).enqueue(object : Callback<TrackResponse> {
             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                if (response.code() == 200) {
-                    tracks.clear()
-                    if (response.body()?.results?.isNotEmpty() == true) {
-                        tracks.addAll(response.body()?.results!!)
-                        adapter.notifyDataSetChanged()
-                        placeholderLayoutNotFound.visibility = View.GONE
-                        placeholderLayoutConnectionError.visibility = View.GONE
-                    } else {
-                        tracks.clear()
-                        adapter.notifyDataSetChanged()
-                        placeholderLayoutNotFound.visibility = View.VISIBLE
-                        placeholderLayoutConnectionError.visibility = View.GONE
-                    }
-                } else {
-                    tracks.clear()
+                tracks.clear()
+                if (response.isSuccessful && response.body()?.results?.isNotEmpty() == true) {
+                    tracks.addAll(response.body()?.results!!)
                     adapter.notifyDataSetChanged()
-                    placeholderLayoutConnectionError.visibility = View.VISIBLE
-                    placeholderLayoutNotFound.visibility = View.GONE
+                    updatePlaceholders(showNotFound = false, showConnectionError = false)
+                } else if (response.isSuccessful) {
+                    adapter.notifyDataSetChanged()
+                    updatePlaceholders(showNotFound = true, showConnectionError = false)
+                } else {
+                    adapter.notifyDataSetChanged()
+                    updatePlaceholders(showNotFound = false, showConnectionError = true)
                 }
             }
 
             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                 tracks.clear()
                 adapter.notifyDataSetChanged()
-                placeholderLayoutConnectionError.visibility = View.VISIBLE
-                placeholderLayoutNotFound.visibility = View.GONE
+                updatePlaceholders(showNotFound = false, showConnectionError = true)
             }
         })
     }
 
 
+    private fun updatePlaceholders(showNotFound: Boolean, showConnectionError: Boolean) {
+        placeholderLayoutNotFound.visibility = if (showNotFound) View.VISIBLE else View.GONE
+        placeholderLayoutConnectionError.visibility =
+            if (showConnectionError) View.VISIBLE else View.GONE
+    }
 }
-
