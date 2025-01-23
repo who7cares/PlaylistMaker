@@ -24,11 +24,13 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class SearchActivity: AppCompatActivity() {
+class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private lateinit var searchEditText:EditText
     private lateinit var buttonArrowBack:ImageView
     private lateinit var closeImageView:ImageView
+
+    private lateinit var recyclerViewForSearch: RecyclerView
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var placeholderLayoutNotFound: LinearLayout
@@ -36,9 +38,13 @@ class SearchActivity: AppCompatActivity() {
     private lateinit var updateButton:Button
 
     private var searchText: String? = null
-    private val adapter = SearchAdapter()
+
+    private val adapter = SearchAdapter(this)
+    private val adapterForSearch = SearchAdapter(this)
 
     private val tracks = ArrayList<Track>()
+    private val searchTracks = ArrayList<Track>()
+
     private val gson = Gson()
 
     private val retrofit = Retrofit.Builder()
@@ -58,6 +64,8 @@ class SearchActivity: AppCompatActivity() {
         searchEditText = findViewById(R.id.search_editText)
         buttonArrowBack = findViewById(R.id.arrow_back_search)
         closeImageView = findViewById(R.id.close_ImageView_button)
+
+        recyclerViewForSearch = findViewById(R.id.search_list)
         recyclerView = findViewById(R.id.track_list)
 
         placeholderLayoutNotFound = findViewById(R.id.placeholderLayout_notFound)
@@ -65,10 +73,12 @@ class SearchActivity: AppCompatActivity() {
         updateButton = findViewById(R.id.updateButton)
 
 
-
         // логика работы RecycleView
         adapter.tracks = tracks
         recyclerView.adapter = adapter
+
+        adapterForSearch.tracks = searchTracks
+        recyclerViewForSearch.adapter = adapterForSearch
 
 
         // Добавление TextWatcher после восстановления текста
@@ -108,6 +118,14 @@ class SearchActivity: AppCompatActivity() {
 
     }
 
+    // реализация интерфейса из класса SearchAdapter для добавления нажатых треков в новый список
+    override fun onItemClick(track: Track) {
+        if (!searchTracks.contains(track)) {
+            searchTracks.add(track)
+            // Обновите адаптер для второго RecyclerView
+            adapterForSearch.notifyItemInserted(searchTracks.size - 1)
+        }
+    }
 
 
     private val simpleTextWatcher = object : TextWatcher {
@@ -197,5 +215,7 @@ class SearchActivity: AppCompatActivity() {
             }
         })
     }
+
+
 }
 

@@ -81,23 +81,44 @@
         android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-
         android:id="@+id/track_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/screen_margins"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+
+
+        <!-- Сохраненный список треков -->
+        <LinearLayout
+
+            style="@style/linear_layout_for_search"
+            android:id="@+id/searched_tracks" >
+
+            <TextView
+                style="@style/text_search_error"
+                android:text="@string/your_search"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/search_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/screen_margins"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <Button
+                style="@style/button_for_updateButton_and_clearSearchList"
+                android:id="@+id/searched_tracksButton"
+                android:text="@string/clean_search_list" />
+        </LinearLayout>
+
+
+
         <!-- Плейсхолдер при ненаходе песен -->
         <LinearLayout
+            style="@style/linear_layout_for_search"
             android:visibility="invisible"
-            android:id="@+id/placeholderLayout_notFound"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp">
+            android:id="@+id/placeholderLayout_notFound" >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -111,14 +132,9 @@
 
         <!-- Плейсхолдер при ошибке подключения -->
         <LinearLayout
+            style="@style/linear_layout_for_search"
             android:visibility="invisible"
-            android:id="@+id/placeholderLayout_connectionError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp">
+            android:id="@+id/placeholderLayout_connectionError" >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -137,14 +153,9 @@
                 android:gravity="center" />
 
             <Button
+                style="@style/button_for_updateButton_and_clearSearchList"
                 android:id="@+id/updateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/screen_margins"
-                android:backgroundTint="@color/text_error_color"
-                android:text="@string/reConnect"
-                android:textColor="@color/search_background"
-                app:cornerRadius="54dp" />
+                android:text="@string/reConnect" />
         </LinearLayout>
 
     </FrameLayout>
