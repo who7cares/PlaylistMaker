@@ -11,7 +11,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.MainActivity
@@ -24,10 +23,12 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+const val SEARCH_LIST: String = "search_list"
+
 class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private lateinit var searchEditText:EditText
-    private lateinit var buttonArrowBack:ImageView
+    private lateinit var arrowBackButton:ImageView
     private lateinit var closeImageView:ImageView
 
     private lateinit var recyclerViewForSearch: RecyclerView
@@ -37,6 +38,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private lateinit var placeholderLayoutConnectionError: LinearLayout
     private lateinit var layoutForSearchList: LinearLayout
     private lateinit var updateButton:Button
+    private lateinit var searchTracksClearButton: Button
 
     private var searchText: String? = null
 
@@ -56,6 +58,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private val iTunesService = retrofit.create(iTunesApi::class.java)
 
 
+    private val searchPreferences = SearchPreferences()
+
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +67,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         setContentView(R.layout.activity_search)
 
         searchEditText = findViewById(R.id.search_editText)
-        buttonArrowBack = findViewById(R.id.arrow_back_search)
+        arrowBackButton = findViewById(R.id.arrow_back_search)
         closeImageView = findViewById(R.id.close_ImageView_button)
 
         recyclerViewForSearch = findViewById(R.id.search_list)
@@ -74,6 +78,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         updateButton = findViewById(R.id.updateButton)
         layoutForSearchList = findViewById(R.id.searched_tracks)
 
+        searchTracksClearButton = findViewById(R.id.searched_tracksButton_clear)
+
 
         // логика работы RecycleView
         adapter.tracks = tracks
@@ -81,6 +87,12 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
         adapterForSearch.tracks = searchTracks
         recyclerViewForSearch.adapter = adapterForSearch
+
+
+        // Загружаем сохраненные данные о истории поиска песен
+        val savedSearchTracks = searchPreferences.read(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE))
+        searchTracks.addAll(savedSearchTracks)
+        adapterForSearch.notifyDataSetChanged()
 
 
         // Добавление TextWatcher после восстановления текста
@@ -96,9 +108,16 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             updatePlaceholders(showNotFound = false, showConnectionError = false)
         }
 
-        buttonArrowBack.setOnClickListener {
+        arrowBackButton.setOnClickListener {
             val intent = Intent(this@SearchActivity, MainActivity::class.java)
             startActivity(intent)
+        }
+
+        searchTracksClearButton.setOnClickListener {
+            searchTracks.clear()
+            adapterForSearch.notifyDataSetChanged()
+            searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+
         }
 
 
@@ -115,6 +134,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             }
         }
 
+        // убираем список сохраненных песен при фокусе на editText
         searchEditText.setOnFocusChangeListener { view, hasFocus ->
             layoutForSearchList.visibility = if (hasFocus && searchEditText.text.isEmpty()) View.VISIBLE else View.INVISIBLE
         }
@@ -123,6 +143,13 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         updateButton.setOnClickListener {
             fetchTracks(searchEditText.text.toString())
         }
+
+    }
+
+    // сохраняем историю поиска песен
+    override fun onStop() {
+        super.onStop()
+        searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
 
     }
 
@@ -170,8 +197,6 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         val tracksJson = gson.toJson(tracks)
         outState.putString("tracks", tracksJson)
 
-        val searchTracksJson = gson.toJson(searchTracks)
-        outState.putString("searchTracks", searchTracksJson)
 
         outState.putInt("placeholderNotFoundVisibility", placeholderLayoutNotFound.visibility)
         outState.putInt("placeholderConnectionErrorVisibility", placeholderLayoutConnectionError.visibility)
@@ -193,13 +218,6 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             adapter.notifyDataSetChanged()
         }
 
-        val savedSearchTracksJson = savedInstanceState.getString("searchTracks")
-        if (!savedSearchTracksJson.isNullOrEmpty()) {
-            val trackType = object : TypeToken<ArrayList<Track>>() {}.type
-            val restoredTracks: ArrayList<Track> = gson.fromJson(savedSearchTracksJson, trackType)
-            searchTracks.addAll(restoredTracks)
-            adapter.notifyDataSetChanged()
-        }
 
         placeholderLayoutNotFound.visibility = savedInstanceState.getInt("placeholderNotFoundVisibility", View.GONE)
         placeholderLayoutConnectionError.visibility = savedInstanceState.getInt("placeholderConnectionErrorVisibility", View.GONE)

@@ -16,6 +16,11 @@ class SearchAdapter(
     private val isClickable: Boolean = false
 ) : RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
 
+    interface OnItemClickListener {
+        fun onItemClick(track: Track)
+    }
+
+
     var tracks = ArrayList<Track>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder =
@@ -32,9 +37,7 @@ class SearchAdapter(
 
     override fun getItemCount(): Int = tracks.size
 
-    interface OnItemClickListener {
-        fun onItemClick(track: Track)
-    }
+
 
 
     class SearchViewHolder(parent: ViewGroup): RecyclerView.ViewHolder(
