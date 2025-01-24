@@ -91,7 +91,7 @@
 
         <!-- Сохраненный список треков -->
         <LinearLayout
-
+            android:visibility="gone"
             style="@style/linear_layout_for_search"
             android:id="@+id/searched_tracks" >
 
@@ -102,13 +102,14 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/search_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginTop="@dimen/screen_margins"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <Button
                 style="@style/button_for_updateButton_and_clearSearchList"
-                android:id="@+id/searched_tracksButton"
+                android:id="@+id/searched_tracksButton_clear"
                 android:text="@string/clean_search_list" />
         </LinearLayout>
 

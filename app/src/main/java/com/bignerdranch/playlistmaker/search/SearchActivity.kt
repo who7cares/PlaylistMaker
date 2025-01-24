@@ -181,7 +181,11 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
             layoutForSearchList.visibility = if (searchEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
 
-            if (p0.isNullOrEmpty())  updatePlaceholders(showNotFound = false, showConnectionError = false)
+            if (p0.isNullOrEmpty())  {
+                updatePlaceholders(showNotFound = false, showConnectionError = false)
+                tracks.clear()
+                adapter.notifyDataSetChanged()
+            }
         }
         override fun afterTextChanged(p0: Editable?) {
         }
