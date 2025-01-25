@@ -81,6 +81,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         searchTracksClearButton = findViewById(R.id.searched_tracksButton_clear)
 
 
+
+
         // логика работы RecycleView
         adapter.tracks = tracks
         recyclerView.adapter = adapter
@@ -94,6 +96,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         searchTracks.addAll(savedSearchTracks)
         adapterForSearch.notifyDataSetChanged()
 
+        layoutForSearchList.visibility = if (searchTracks.isNotEmpty()) View.VISIBLE else View.GONE
+
 
         // Добавление TextWatcher после восстановления текста
         searchEditText.addTextChangedListener(simpleTextWatcher)
@@ -105,7 +109,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             hideKeyboard()
             tracks.clear()
             adapter.notifyDataSetChanged()
-            updatePlaceholders(showNotFound = false, showConnectionError = false)
+            updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = true)
         }
 
         arrowBackButton.setOnClickListener {
@@ -117,6 +121,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             searchTracks.clear()
             adapterForSearch.notifyDataSetChanged()
             searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+            layoutForSearchList.visibility = View.GONE
 
         }
 
@@ -136,7 +141,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
         // убираем список сохраненных песен при фокусе на editText
         searchEditText.setOnFocusChangeListener { view, hasFocus ->
-            layoutForSearchList.visibility = if (hasFocus && searchEditText.text.isEmpty()) View.VISIBLE else View.INVISIBLE
+
+            layoutForSearchList.visibility = if (hasFocus && searchEditText.text.isEmpty()) View.INVISIBLE else View.VISIBLE
         }
 
         // Повторный запрос в iTunes
@@ -182,7 +188,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
             layoutForSearchList.visibility = if (searchEditText.hasFocus() && p0?.isEmpty() == true) View.VISIBLE else View.GONE
 
             if (p0.isNullOrEmpty())  {
-                updatePlaceholders(showNotFound = false, showConnectionError = false)
+                updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = true)
                 tracks.clear()
                 adapter.notifyDataSetChanged()
             }
@@ -243,28 +249,28 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
                 if (response.isSuccessful && response.body()?.results?.isNotEmpty() == true) {
                     tracks.addAll(response.body()?.results!!)
                     adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = false)
+                    updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = false)
                 } else if (response.isSuccessful) {
                     adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = true, showConnectionError = false)
+                    updatePlaceholders(showNotFound = true, showConnectionError = false, showViewSearch = false)
                 } else {
                     adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = true)
+                    updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
                 }
             }
 
             override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                 tracks.clear()
                 adapter.notifyDataSetChanged()
-                updatePlaceholders(showNotFound = false, showConnectionError = true)
+                updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
             }
         })
     }
 
 
-    private fun updatePlaceholders(showNotFound: Boolean, showConnectionError: Boolean) {
+    private fun updatePlaceholders(showNotFound: Boolean, showConnectionError: Boolean, showViewSearch: Boolean) {
         placeholderLayoutNotFound.visibility = if (showNotFound) View.VISIBLE else View.GONE
-        placeholderLayoutConnectionError.visibility =
-            if (showConnectionError) View.VISIBLE else View.GONE
+        placeholderLayoutConnectionError.visibility = if (showConnectionError) View.VISIBLE else View.GONE
+        layoutForSearchList.visibility = if (showViewSearch && searchTracks.isNotEmpty()) View.VISIBLE else View.GONE
     }
 }

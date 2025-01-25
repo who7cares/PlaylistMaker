@@ -91,7 +91,7 @@
 
         <!-- Сохраненный список треков -->
         <LinearLayout
-            android:visibility="gone"
+
             style="@style/linear_layout_for_search"
             android:id="@+id/searched_tracks" >
 
