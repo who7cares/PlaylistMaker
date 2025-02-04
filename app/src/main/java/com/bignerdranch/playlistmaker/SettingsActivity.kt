@@ -6,7 +6,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import com.bignerdranch.playlistmaker.search.App
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
@@ -29,6 +31,10 @@ class SettingsActivity : AppCompatActivity() {
         sendToSupport = findViewById(R.id.support)
         userAgreement = findViewById(R.id.user_agreement)
 
+
+        // Синхронизация переключателя с текущей темой
+        val app = applicationContext as App
+        switch.isChecked = app.darkTheme
 
         buttonArrowBack.setOnClickListener {
             val intent = Intent(this@SettingsActivity, MainActivity::class.java)
@@ -80,83 +86,9 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(chooserIntent)
         }
 
-//        // Получаем сохраненный режим из SharedPreferences
-//        val isDarkMode = getDarkModePreference()
-//
-//        // Устанавливаем начальное состояние переключателя в зависимости от сохраненной темы
-//        switch.isChecked = isDarkMode
-//
-//        switch.setOnCheckedChangeListener { _, isChecked ->
-//            // Сохраняем выбор пользователя в SharedPreferences
-//            saveDarkModePreference(isChecked)
-//
-//            // Меняем тему
-//            if (isChecked) {
-//                // Темная тема
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-//            } else {
-//                // Светлая тема
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-//            }
-//
-//            // Перезапускаем активность, чтобы применить изменения темы
-//            recreate()
-//        }
-//    }
-//
-//    // Метод для получения состояния темы из SharedPreferences
-//    private fun getDarkModePreference(): Boolean {
-//        val sharedPreferences = getSharedPreferences("theme_preferences", MODE_PRIVATE)
-//        return sharedPreferences.getBoolean("dark_mode", false) // по умолчанию светлая тема
-//    }
-//
-//    // Метод для сохранения состояния темы в SharedPreferences
-//    private fun saveDarkModePreference(isDarkMode: Boolean) {
-//        val sharedPreferences = getSharedPreferences("theme_preferences", MODE_PRIVATE)
-//        val editor = sharedPreferences.edit()
-//        editor.putBoolean("dark_mode", isDarkMode)
-//        editor.apply()
-//    }
-
-
-        // Устанавливаем начальные цвета свича сразу при запуске
-        switch.trackDrawable.setColorFilter(
-            ContextCompat.getColor(this, R.color.track_off),
-            PorterDuff.Mode.SRC_IN
-        )
-
-        switch.thumbDrawable.setColorFilter(
-            ContextCompat.getColor(this, R.color.thumb_off),
-            PorterDuff.Mode.SRC_IN
-        )
-
-
-        // изменяем цвет свича
-        switch.setOnCheckedChangeListener { _, isChecked ->
-            // Изменение цвета полоски (track)
-            if (isChecked) {
-                switch.trackDrawable.setColorFilter(
-                    ContextCompat.getColor(this, R.color.track_on),
-                    PorterDuff.Mode.SRC_IN
-                )
-
-                // Изменение цвета ползунка (thumb)
-                switch.thumbDrawable.setColorFilter(
-                    ContextCompat.getColor(this, R.color.thumb_on),
-                    PorterDuff.Mode.SRC_IN
-                )
-            } else {
-                switch.trackDrawable.setColorFilter(
-                    ContextCompat.getColor(this, R.color.track_off),
-                    PorterDuff.Mode.SRC_IN
-                )
-
-                // Изменение цвета ползунка (thumb)
-                switch.thumbDrawable.setColorFilter(
-                    ContextCompat.getColor(this, R.color.thumb_off),
-                    PorterDuff.Mode.SRC_IN
-                )
-            }
+        switch.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
         }
+
     }
 }

@@ -39,7 +39,9 @@
         android:id="@+id/switch_compat"
         style="@style/text_settings_style"
         android:gravity="center_vertical"
-        android:text="@string/dark_theme" />
+        android:text="@string/dark_theme"
+        app:thumbTint="@color/thumb_tint"
+        app:trackTint="@color/track_tint"/>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/share"
