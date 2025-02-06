@@ -273,4 +273,6 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         placeholderLayoutConnectionError.visibility = if (showConnectionError) View.VISIBLE else View.GONE
         layoutForSearchList.visibility = if (showViewSearch && searchTracks.isNotEmpty()) View.VISIBLE else View.GONE
     }
+
+
 }
