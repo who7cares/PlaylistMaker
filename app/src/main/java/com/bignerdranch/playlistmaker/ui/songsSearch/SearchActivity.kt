@@ -1,6 +1,10 @@
-package com.bignerdranch.playlistmaker.search
+package com.bignerdranch.playlistmaker.ui.songsSearch
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,6 +22,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.R
 import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
 import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
+import com.bignerdranch.playlistmaker.search.SearchPreferences
+import com.bignerdranch.playlistmaker.search.Track
+import com.bignerdranch.playlistmaker.data.dto.TrackResponse
+import com.bignerdranch.playlistmaker.data.network.iTunesApi
+import com.bignerdranch.playlistmaker.domain.api.TrackRepository
+import com.bignerdranch.playlistmaker.domain.api.TracksInteractor
+import com.bignerdranch.playlistmaker.domain.impl.TrackInteractorImpl
+import com.bignerdranch.playlistmaker.presentation.App
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
@@ -54,12 +66,8 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private val gson = Gson()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    private val iTunesService = retrofit.create(iTunesApi::class.java)
+
     private val searchPreferences = SearchPreferences()
 
 
@@ -72,6 +80,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private var isClickAllowed = true
 
     private lateinit var navigateBackUseCase: NavigateBackUseCase
+    private lateinit var tracksInteractor: TracksInteractor
 
 
 
@@ -81,6 +90,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         setContentView(R.layout.activity_search)
 
         navigateBackUseCase = NavigateBackUseCaseImpl(this)
+        tracksInteractor = (applicationContext as App).tracksInteractor
 
         searchEditText = findViewById(R.id.search_editText)
         arrowBackButton = findViewById(R.id.arrow_back_search)
@@ -258,30 +268,32 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     // логика работы iTunesAPI
     private fun fetchTracks(searchQuery: String) {
-        if (searchQuery.isEmpty()) return  // Не делать запрос, если строка пустая
-        progressBar.visibility = View.VISIBLE
-        iTunesService.findTrack(searchQuery).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                progressBar.visibility = View.GONE
-                tracks.clear()
-                if (response.isSuccessful && response.body()?.results?.isNotEmpty() == true) {
-                    tracks.addAll(response.body()?.results!!)
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = false)
-                } else if (response.isSuccessful) {
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = true, showConnectionError = false, showViewSearch = false)
-                } else {
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
-                }
-            }
+        if (searchQuery.isEmpty()) return
 
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                progressBar.visibility = View.GONE
-                tracks.clear()
-                adapter.notifyDataSetChanged()
-                updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
+        progressBar.visibility = View.VISIBLE
+
+        // Проверяем интернет перед запросом
+        if (!isNetworkAvailable(this)) {
+            progressBar.visibility = View.GONE
+            updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
+            return
+        }
+
+        // Вызываем интерактор, который делегирует работу репозиторию
+        tracksInteractor.searchTrack(searchQuery, object : TracksInteractor.TrackConsumer {
+            override fun consume(foundTracks: List<Track>) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    tracks.clear()
+                    if (foundTracks.isNotEmpty()) {
+                        tracks.addAll(foundTracks)
+                        adapter.notifyDataSetChanged()
+                        updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = false)
+                    } else {
+                        adapter.notifyDataSetChanged()
+                        updatePlaceholders(showNotFound = true, showConnectionError = false, showViewSearch = false)
+                    }
+                }
             }
         })
     }
@@ -313,5 +325,18 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     override fun isClickAllowed(): Boolean {
         return clickDebounce()
+    }
+
+    // проверка доступности сети
+    private fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            activeNetworkInfo != null && activeNetworkInfo.isConnected
+        }
     }
 }

@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.playlistmaker.R
-import com.bignerdranch.playlistmaker.search.SearchActivity
+import com.bignerdranch.playlistmaker.ui.songsSearch.SearchActivity
 
 
 // использование чистой архитектуры может быть избыточным,
