@@ -130,18 +130,6 @@ class AudioPlayer : AppCompatActivity() {
         }
 
 
-//        playPauseButton.setOnClickListener {
-//            val currentDrawable = playPauseButton.drawable
-//            val pauseDrawable = ContextCompat.getDrawable(this, R.drawable.pause_icon)
-//
-//            // Сравниваем состояния drawable, а не сами объекты
-//            if (currentDrawable.constantState == pauseDrawable?.constantState) {
-//                playPauseButton.setImageResource(R.drawable.play_arrow_icon)
-//            } else {
-//                playPauseButton.setImageResource(R.drawable.pause_icon)
-//            }
-//        }
-
         addToLikeButton.setOnClickListener {
             val currentDrawable = addToLikeButton.drawable
             val likeDrawable = ContextCompat.getDrawable(this, R.drawable.empty_like)

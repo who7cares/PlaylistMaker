@@ -1,14 +1,12 @@
 package com.bignerdranch.playlistmaker
 
 import android.content.Intent
-import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
-import com.bignerdranch.playlistmaker.search.App
+import com.bignerdranch.playlistmaker.domain.theme.ThemeUseCase
+import com.bignerdranch.playlistmaker.presentation.App
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
@@ -20,9 +18,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var sendToSupport: MaterialTextView
     private lateinit var userAgreement: MaterialTextView
 
+    private lateinit var themeUseCase: ThemeUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
         setContentView(R.layout.activity_settings)
 
         buttonArrowBack = findViewById(R.id.arrow_back)
@@ -32,9 +31,13 @@ class SettingsActivity : AppCompatActivity() {
         userAgreement = findViewById(R.id.user_agreement)
 
 
+
+        // Получаем instance ThemeUseCase
+        themeUseCase = (applicationContext as App).themeUseCase
         // Синхронизация переключателя с текущей темой
-        val app = applicationContext as App
-        switch.isChecked = app.darkTheme
+        switch.isChecked = themeUseCase.getTheme()
+
+
 
         buttonArrowBack.setOnClickListener {
             val intent = Intent(this@SettingsActivity, MainActivity::class.java)
@@ -86,8 +89,8 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(chooserIntent)
         }
 
-        switch.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
+        switch.setOnCheckedChangeListener { _, checked ->
+            themeUseCase.switchTheme(checked)
         }
 
     }
