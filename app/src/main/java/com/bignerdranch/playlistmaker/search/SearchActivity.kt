@@ -1,7 +1,6 @@
 package com.bignerdranch.playlistmaker.search
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,8 +15,9 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.bignerdranch.playlistmaker.MainActivity
 import com.bignerdranch.playlistmaker.R
+import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
+import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import retrofit2.Call
@@ -71,12 +71,16 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private var handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
 
+    private lateinit var navigateBackUseCase: NavigateBackUseCase
+
 
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        navigateBackUseCase = NavigateBackUseCaseImpl(this)
 
         searchEditText = findViewById(R.id.search_editText)
         arrowBackButton = findViewById(R.id.arrow_back_search)
@@ -123,8 +127,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         }
 
         arrowBackButton.setOnClickListener {
-            val intent = Intent(this@SearchActivity, MainActivity::class.java)
-            startActivity(intent)
+            navigateBackUseCase.navigateBack()
         }
 
         searchTracksClearButton.setOnClickListener {

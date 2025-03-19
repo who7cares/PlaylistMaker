@@ -1,10 +1,17 @@
-package com.bignerdranch.playlistmaker
+package com.bignerdranch.playlistmaker.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.bignerdranch.playlistmaker.R
+import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
+import com.bignerdranch.playlistmaker.domain.api.OpenUserAgreementUseCase
+import com.bignerdranch.playlistmaker.domain.api.SendSupportEmailUseCase
+import com.bignerdranch.playlistmaker.domain.api.ShareAppUseCase
+import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
+import com.bignerdranch.playlistmaker.domain.impl.OpenUserAgreementUseCaseImp
+import com.bignerdranch.playlistmaker.domain.impl.SendSupportEmailUseCaseImp
+import com.bignerdranch.playlistmaker.domain.impl.ShareAppUseCaseImpl
 import com.bignerdranch.playlistmaker.domain.theme.ThemeUseCase
 import com.bignerdranch.playlistmaker.presentation.App
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -19,6 +26,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var userAgreement: MaterialTextView
 
     private lateinit var themeUseCase: ThemeUseCase
+    private lateinit var navigateBackUseCase: NavigateBackUseCase
+    private lateinit var shareAppUseCase: ShareAppUseCase
+    private lateinit var sendSupportEmailUseCase: SendSupportEmailUseCase
+    private lateinit var openUserAgreementUseCase: OpenUserAgreementUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,55 +49,39 @@ class SettingsActivity : AppCompatActivity() {
         switch.isChecked = themeUseCase.getTheme()
 
 
+        navigateBackUseCase = NavigateBackUseCaseImpl(this)
+        shareAppUseCase = ShareAppUseCaseImpl(this)
+        sendSupportEmailUseCase = SendSupportEmailUseCaseImp(this)
+        openUserAgreementUseCase = OpenUserAgreementUseCaseImp(this)
+
 
         buttonArrowBack.setOnClickListener {
-            val intent = Intent(this@SettingsActivity, MainActivity::class.java)
-            startActivity(intent)
+            navigateBackUseCase.navigateBack()
         }
 
 
         share.setOnClickListener {
             val url = getString(R.string.share_url)
-
-            val intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, url)  // передаем ссылку на страницу Google
-                type = "text/plain"  // Указываем тип данных - обычный текст
-            }
-
-            // Проверяем, может ли устройство обработать этот интент
-            val chooserIntent = Intent.createChooser(intent, "Поделиться через")
-            startActivity(chooserIntent)
+            shareAppUseCase.share(url)
         }
 
 
         sendToSupport.setOnClickListener {
             val email = getString(R.string.sendToSupport_email)
             val theme = getString(R.string.sendToSupport_theme)
-            val text = getString(R.string.sendToSupport_text)
+            val message = getString(R.string.sendToSupport_text)
 
-            val intent = Intent().apply {
-                action = Intent.ACTION_SENDTO
-                data = Uri.parse("mailto:$email")
-
-                putExtra(Intent.EXTRA_SUBJECT, theme)
-                putExtra(Intent.EXTRA_TEXT, text)
-            }
-
-            val chooserIntent = Intent.createChooser(intent, "Отправить по почте:")
-            startActivity(chooserIntent)
+            sendSupportEmailUseCase.sendSupportEmail(
+                email,
+                theme,
+                message
+            )
         }
 
 
         userAgreement.setOnClickListener {
             val url = getString(R.string.userAgreement_url)
-            val intent = Intent().apply {
-                action = Intent.ACTION_VIEW
-                data = Uri.parse(url)
-            }
-
-            val chooserIntent = Intent.createChooser(intent, "Выберите бразуер:")
-            startActivity(chooserIntent)
+            openUserAgreementUseCase.open(url)
         }
 
         switch.setOnCheckedChangeListener { _, checked ->
