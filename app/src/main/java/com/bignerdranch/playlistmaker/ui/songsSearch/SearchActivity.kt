@@ -20,6 +20,8 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.R
+import com.bignerdranch.playlistmaker.data.NetworkChecker
+import com.bignerdranch.playlistmaker.data.network.NetworkCheckerImpl
 import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
 import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
 import com.bignerdranch.playlistmaker.data.sharedPrefSearch.SearchPreferences
@@ -73,6 +75,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private lateinit var navigateBackUseCase: NavigateBackUseCase
     private lateinit var tracksInteractor: TracksInteractor
+    private lateinit var networkChecker: NetworkChecker
 
 
 
@@ -83,6 +86,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
         navigateBackUseCase = NavigateBackUseCaseImpl(this)
         tracksInteractor = (applicationContext as App).tracksInteractor
+        networkChecker = NetworkCheckerImpl()
 
         searchEditText = findViewById(R.id.search_editText)
         arrowBackButton = findViewById(R.id.arrow_back_search)
@@ -267,7 +271,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         progressBar.visibility = View.VISIBLE
 
         // Проверяем интернет перед запросом
-        if (!isNetworkAvailable(this)) {
+        if (!networkChecker.isNetworkAvailable(this)) {
             progressBar.visibility = View.GONE
             updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
             return
@@ -319,18 +323,5 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     override fun isClickAllowed(): Boolean {
         return clickDebounce()
-    }
-
-    // проверка доступности сети
-    private fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-        } else {
-            val activeNetworkInfo = connectivityManager.activeNetworkInfo
-            activeNetworkInfo != null && activeNetworkInfo.isConnected
-        }
     }
 }
