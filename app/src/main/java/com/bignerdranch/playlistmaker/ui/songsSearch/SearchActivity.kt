@@ -1,7 +1,10 @@
-package com.bignerdranch.playlistmaker.search
+package com.bignerdranch.playlistmaker.ui.songsSearch
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -16,15 +19,18 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.bignerdranch.playlistmaker.MainActivity
 import com.bignerdranch.playlistmaker.R
+import com.bignerdranch.playlistmaker.data.NetworkChecker
+import com.bignerdranch.playlistmaker.data.network.NetworkCheckerImpl
+import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
+import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
+import com.bignerdranch.playlistmaker.data.sharedPrefSearch.SearchPreferences
+import com.bignerdranch.playlistmaker.data.sharedPrefSearch.SearchPreferencesStorage
+import com.bignerdranch.playlistmaker.domain.models.Track
+import com.bignerdranch.playlistmaker.domain.api.TracksInteractor
+import com.bignerdranch.playlistmaker.presentation.App
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 const val SEARCH_LIST: String = "search_list"
 
@@ -54,13 +60,9 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     private val gson = Gson()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    private val iTunesService = retrofit.create(iTunesApi::class.java)
-    private val searchPreferences = SearchPreferences()
+
+    private lateinit var searchPreferences: SearchPreferencesStorage
 
 
     companion object {
@@ -71,12 +73,20 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     private var handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
 
+    private lateinit var navigateBackUseCase: NavigateBackUseCase
+    private lateinit var tracksInteractor: TracksInteractor
+    private lateinit var networkChecker: NetworkChecker
+
 
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        navigateBackUseCase = NavigateBackUseCaseImpl(this)
+        tracksInteractor = (applicationContext as App).tracksInteractor
+        networkChecker = NetworkCheckerImpl()
 
         searchEditText = findViewById(R.id.search_editText)
         arrowBackButton = findViewById(R.id.arrow_back_search)
@@ -102,8 +112,10 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
 
         // Загружаем сохраненные данные о истории поиска песен
-        val savedSearchTracks = searchPreferences.read(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE))
-        searchTracks.addAll(savedSearchTracks)
+        val sharedPreferences = getSharedPreferences(SEARCH_LIST, MODE_PRIVATE)
+        searchPreferences = SearchPreferences(sharedPreferences)
+
+        searchTracks.addAll(searchPreferences.read())
         adapterForSearch.notifyDataSetChanged()
 
         layoutForSearchList.visibility = if (searchTracks.isNotEmpty()) View.VISIBLE else View.GONE
@@ -123,14 +135,13 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         }
 
         arrowBackButton.setOnClickListener {
-            val intent = Intent(this@SearchActivity, MainActivity::class.java)
-            startActivity(intent)
+            navigateBackUseCase.navigateBack()
         }
 
         searchTracksClearButton.setOnClickListener {
             searchTracks.clear()
             adapterForSearch.notifyDataSetChanged()
-            searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+            searchPreferences.write(searchTracks)
             layoutForSearchList.visibility = View.GONE
 
         }
@@ -165,7 +176,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     // сохраняем историю поиска песен
     override fun onStop() {
         super.onStop()
-        searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+        searchPreferences.write(searchTracks)
 
     }
 
@@ -255,30 +266,32 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     // логика работы iTunesAPI
     private fun fetchTracks(searchQuery: String) {
-        if (searchQuery.isEmpty()) return  // Не делать запрос, если строка пустая
-        progressBar.visibility = View.VISIBLE
-        iTunesService.findTrack(searchQuery).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                progressBar.visibility = View.GONE
-                tracks.clear()
-                if (response.isSuccessful && response.body()?.results?.isNotEmpty() == true) {
-                    tracks.addAll(response.body()?.results!!)
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = false)
-                } else if (response.isSuccessful) {
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = true, showConnectionError = false, showViewSearch = false)
-                } else {
-                    adapter.notifyDataSetChanged()
-                    updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
-                }
-            }
+        if (searchQuery.isEmpty()) return
 
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                progressBar.visibility = View.GONE
-                tracks.clear()
-                adapter.notifyDataSetChanged()
-                updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
+        progressBar.visibility = View.VISIBLE
+
+        // Проверяем интернет перед запросом
+        if (!networkChecker.isNetworkAvailable(this)) {
+            progressBar.visibility = View.GONE
+            updatePlaceholders(showNotFound = false, showConnectionError = true, showViewSearch = false)
+            return
+        }
+
+        // Вызываем интерактор, который делегирует работу репозиторию
+        tracksInteractor.searchTrack(searchQuery, object : TracksInteractor.TrackConsumer {
+            override fun consume(foundTracks: List<Track>) {
+                runOnUiThread {
+                    progressBar.visibility = View.GONE
+                    tracks.clear()
+                    if (foundTracks.isNotEmpty()) {
+                        tracks.addAll(foundTracks)
+                        adapter.notifyDataSetChanged()
+                        updatePlaceholders(showNotFound = false, showConnectionError = false, showViewSearch = false)
+                    } else {
+                        adapter.notifyDataSetChanged()
+                        updatePlaceholders(showNotFound = true, showConnectionError = false, showViewSearch = false)
+                    }
+                }
             }
         })
     }

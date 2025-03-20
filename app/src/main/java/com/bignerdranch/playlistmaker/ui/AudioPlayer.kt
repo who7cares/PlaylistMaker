@@ -1,21 +1,18 @@
-package com.bignerdranch.playlistmaker
+package com.bignerdranch.playlistmaker.ui
 
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.bignerdranch.playlistmaker.search.SearchActivity
+import com.bignerdranch.playlistmaker.R
+import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
+import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
@@ -39,6 +36,8 @@ class AudioPlayer : AppCompatActivity() {
     private lateinit var arrowBackButton: ImageView
 
     private lateinit var durationInRealTime: TextView
+
+    private lateinit var navigateBackUseCase: NavigateBackUseCase
 
 
     companion object {
@@ -68,6 +67,8 @@ class AudioPlayer : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audio_player)
+
+        navigateBackUseCase = NavigateBackUseCaseImpl(this)
 
 
 
@@ -124,23 +125,9 @@ class AudioPlayer : AppCompatActivity() {
         preparePlayer()
 
         arrowBackButton .setOnClickListener {
-
-            val _intent = Intent(this@AudioPlayer, SearchActivity::class.java)
-            startActivity(_intent)
+            navigateBackUseCase.navigateBack()
         }
 
-
-//        playPauseButton.setOnClickListener {
-//            val currentDrawable = playPauseButton.drawable
-//            val pauseDrawable = ContextCompat.getDrawable(this, R.drawable.pause_icon)
-//
-//            // Сравниваем состояния drawable, а не сами объекты
-//            if (currentDrawable.constantState == pauseDrawable?.constantState) {
-//                playPauseButton.setImageResource(R.drawable.play_arrow_icon)
-//            } else {
-//                playPauseButton.setImageResource(R.drawable.pause_icon)
-//            }
-//        }
 
         addToLikeButton.setOnClickListener {
             val currentDrawable = addToLikeButton.drawable
