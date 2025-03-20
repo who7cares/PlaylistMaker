@@ -1,4 +1,4 @@
-package com.bignerdranch.playlistmaker
+package com.bignerdranch.playlistmaker.ui
 
 import android.content.Intent
 import android.media.MediaPlayer
@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.bignerdranch.playlistmaker.R
 import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
 import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
 import com.bumptech.glide.Glide

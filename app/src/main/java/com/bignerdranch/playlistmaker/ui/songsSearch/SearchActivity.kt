@@ -22,21 +22,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.playlistmaker.R
 import com.bignerdranch.playlistmaker.domain.api.NavigateBackUseCase
 import com.bignerdranch.playlistmaker.domain.impl.NavigateBackUseCaseImpl
-import com.bignerdranch.playlistmaker.search.SearchPreferences
-import com.bignerdranch.playlistmaker.search.Track
-import com.bignerdranch.playlistmaker.data.dto.TrackResponse
-import com.bignerdranch.playlistmaker.data.network.iTunesApi
-import com.bignerdranch.playlistmaker.domain.api.TrackRepository
+import com.bignerdranch.playlistmaker.data.sharedPrefSearch.SearchPreferences
+import com.bignerdranch.playlistmaker.data.sharedPrefSearch.SearchPreferencesStorage
+import com.bignerdranch.playlistmaker.domain.models.Track
 import com.bignerdranch.playlistmaker.domain.api.TracksInteractor
-import com.bignerdranch.playlistmaker.domain.impl.TrackInteractorImpl
 import com.bignerdranch.playlistmaker.presentation.App
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 const val SEARCH_LIST: String = "search_list"
 
@@ -68,7 +60,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
 
 
-    private val searchPreferences = SearchPreferences()
+    private lateinit var searchPreferences: SearchPreferencesStorage
 
 
     companion object {
@@ -116,8 +108,10 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
 
         // Загружаем сохраненные данные о истории поиска песен
-        val savedSearchTracks = searchPreferences.read(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE))
-        searchTracks.addAll(savedSearchTracks)
+        val sharedPreferences = getSharedPreferences(SEARCH_LIST, MODE_PRIVATE)
+        searchPreferences = SearchPreferences(sharedPreferences)
+
+        searchTracks.addAll(searchPreferences.read())
         adapterForSearch.notifyDataSetChanged()
 
         layoutForSearchList.visibility = if (searchTracks.isNotEmpty()) View.VISIBLE else View.GONE
@@ -143,7 +137,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
         searchTracksClearButton.setOnClickListener {
             searchTracks.clear()
             adapterForSearch.notifyDataSetChanged()
-            searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+            searchPreferences.write(searchTracks)
             layoutForSearchList.visibility = View.GONE
 
         }
@@ -178,7 +172,7 @@ class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
     // сохраняем историю поиска песен
     override fun onStop() {
         super.onStop()
-        searchPreferences.write(getSharedPreferences(SEARCH_LIST, MODE_PRIVATE), searchTracks)
+        searchPreferences.write(searchTracks)
 
     }
 

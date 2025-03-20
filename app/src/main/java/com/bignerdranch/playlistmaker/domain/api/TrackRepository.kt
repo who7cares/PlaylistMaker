@@ -1,6 +1,6 @@
 package com.bignerdranch.playlistmaker.domain.api
 
-import com.bignerdranch.playlistmaker.search.Track
+import com.bignerdranch.playlistmaker.domain.models.Track
 
 interface TrackRepository {
 

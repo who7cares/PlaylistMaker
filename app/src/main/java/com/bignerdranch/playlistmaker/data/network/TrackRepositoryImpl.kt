@@ -1,12 +1,10 @@
 package com.bignerdranch.playlistmaker.data.network
 
-import android.view.View
 import com.bignerdranch.playlistmaker.data.NetworkClient
 import com.bignerdranch.playlistmaker.data.dto.TrackRequest
 import com.bignerdranch.playlistmaker.data.dto.TrackResponse
 import com.bignerdranch.playlistmaker.domain.api.TrackRepository
-import com.bignerdranch.playlistmaker.domain.api.TracksInteractor
-import com.bignerdranch.playlistmaker.search.Track
+import com.bignerdranch.playlistmaker.domain.models.Track
 
 class TrackRepositoryImpl(private val networkClient: NetworkClient) : TrackRepository {
     override fun searchTracks(expression: String): List<Track> {

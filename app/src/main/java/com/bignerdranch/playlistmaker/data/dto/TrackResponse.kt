@@ -1,6 +1,6 @@
 package com.bignerdranch.playlistmaker.data.dto
 
-import com.bignerdranch.playlistmaker.search.Track
+import com.bignerdranch.playlistmaker.domain.models.Track
 
 class TrackResponse(
     val resultCount: Int,
