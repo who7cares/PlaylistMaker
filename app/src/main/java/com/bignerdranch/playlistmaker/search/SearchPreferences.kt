@@ -9,6 +9,7 @@ const val KEY_FOR_SEARCH_LIST: String = "key_for_search_list"
 
 class SearchPreferences {
 
+    // отдельный класс
     fun read(sharedPreferences: SharedPreferences): ArrayList<Track> {
         val json = sharedPreferences.getString(KEY_FOR_SEARCH_LIST, null)
         return if (json.isNullOrEmpty()) {

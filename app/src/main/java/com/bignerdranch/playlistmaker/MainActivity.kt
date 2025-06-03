@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.playlistmaker.search.SearchActivity
 
 class MainActivity : AppCompatActivity() {
+
+    // тут какая архитектура?
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

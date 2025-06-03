@@ -30,6 +30,7 @@ const val SEARCH_LIST: String = "search_list"
 
 class SearchActivity: AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
+    // логику этого класса нужно в clArh?
     private lateinit var searchEditText:EditText
     private lateinit var arrowBackButton:ImageView
     private lateinit var closeImageView:ImageView

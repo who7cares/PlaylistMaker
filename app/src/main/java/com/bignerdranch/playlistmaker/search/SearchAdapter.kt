@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// тут чистая логика нуджна?
 class SearchAdapter(
     private val itemClickListener: OnItemClickListener,
     private val isClickable: Boolean = false

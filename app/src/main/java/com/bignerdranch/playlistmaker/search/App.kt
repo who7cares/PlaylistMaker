@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 
 class App: Application() {
+    // это что
     companion object {
         const val PREFS_NAME = "app_preferences" // Имя SharedPreferences
         const val THEME_KEY = "dark_theme" // Ключ для сохранения темы

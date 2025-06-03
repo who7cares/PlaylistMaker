@@ -4,6 +4,8 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+
+// data -> работа с сетью. network
 interface iTunesApi {
 
     @GET("/search?entity=song")
