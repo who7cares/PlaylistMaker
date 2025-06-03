@@ -51,6 +51,8 @@ class AudioPlayer : AppCompatActivity() {
     private lateinit var previewUrl: String
     private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
+
+    // тут многопточки?
     private val handler = Handler(Looper.getMainLooper())
 
     private val updateRunnable = object : Runnable {
@@ -90,6 +92,7 @@ class AudioPlayer : AppCompatActivity() {
 
 
         // Установка интентов
+        // какая то логика с форматами
         val intent: Intent = intent
 
         val songYearIntent = intent.getStringExtra("songYear") ?: return
@@ -114,6 +117,8 @@ class AudioPlayer : AppCompatActivity() {
         songStyle.text = intent.getStringExtra("songStyle")
         songCountry.text = intent.getStringExtra("songCountry")
 
+
+        // работа с внешней библиотекой
         Glide.with(applicationContext)
             .load(songCoverIntent)
             .fitCenter()
@@ -124,6 +129,8 @@ class AudioPlayer : AppCompatActivity() {
         preparePlayer()
 
         arrowBackButton .setOnClickListener {
+
+            // в отдельный usecase?
 
             val _intent = Intent(this@AudioPlayer, SearchActivity::class.java)
             startActivity(_intent)
@@ -143,6 +150,7 @@ class AudioPlayer : AppCompatActivity() {
 //        }
 
         addToLikeButton.setOnClickListener {
+            // fun addToLike
             val currentDrawable = addToLikeButton.drawable
             val likeDrawable = ContextCompat.getDrawable(this, R.drawable.empty_like)
 
@@ -160,6 +168,7 @@ class AudioPlayer : AppCompatActivity() {
 
     }
 
+    // эт оостается тут^
     override fun onPause() {
         super.onPause()
         pausePlayer()
@@ -172,6 +181,7 @@ class AudioPlayer : AppCompatActivity() {
     }
 
     private fun preparePlayer() {
+        // usecase
         mediaPlayer.setDataSource(previewUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
@@ -186,6 +196,7 @@ class AudioPlayer : AppCompatActivity() {
         }
     }
 
+    // это все куда?
     private fun startPlayer() {
         mediaPlayer.start()
         playPauseButton.setImageResource(R.drawable.pause_icon)
