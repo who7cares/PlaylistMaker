@@ -43,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
 
 
         share.setOnClickListener {
+            // вынести в класс -> usecase
             val url = getString(R.string.share_url)
 
             val intent = Intent().apply {
@@ -58,6 +59,7 @@ class SettingsActivity : AppCompatActivity() {
 
 
         sendToSupport.setOnClickListener {
+            // вынести в класс -> usecase
             val email = getString(R.string.sendToSupport_email)
             val theme = getString(R.string.sendToSupport_theme)
             val text = getString(R.string.sendToSupport_text)
@@ -76,6 +78,7 @@ class SettingsActivity : AppCompatActivity() {
 
 
         userAgreement.setOnClickListener {
+            // вынести в класс -> usecase
             val url = getString(R.string.userAgreement_url)
             val intent = Intent().apply {
                 action = Intent.ACTION_VIEW
@@ -86,6 +89,8 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(chooserIntent)
         }
 
+
+        // эт колбэк^
         switch.setOnCheckedChangeListener { switcher, checked ->
             (applicationContext as App).switchTheme(checked)
         }
